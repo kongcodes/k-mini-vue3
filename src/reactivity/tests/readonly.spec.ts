@@ -1,0 +1,19 @@
+import { readonly } from "../reactive";
+
+describe("readonly", () => {
+	it("happy path", () => {
+		// not allow set
+		const original = { foo: 1, bar: { baz: 1 } };
+		const wrapped = readonly(original);
+		expect(wrapped).not.toBe(original);
+		expect(wrapped.foo).toBe(1);
+	});
+
+	it("warn when call set", () => {
+		const user = readonly({ age: 10 });
+		// mock -> 验证 console.warn 有没有被调用
+		console.warn = jest.fn();
+		user.age = 11;
+		expect(console.warn).toBeCalled();
+	});
+});

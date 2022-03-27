@@ -1,22 +1,13 @@
-import { track, trigger } from "./effect";
+import { mutableHanders, readonlyHanders } from "./baseHandles";
 
-export function reactive(raw){
-  return new Proxy(raw, {
-    get(target, key){
-      const res = Reflect.get(target, key);
+export function reactive(raw) {
+	return createReactiveObject(raw, mutableHanders);
+}
 
-      // 依赖收集
-      track(target, key);
-      return res;
-    },
-    
-    set(target, key, value){
-      const res = Reflect.set(target, key, value);
+export function readonly(raw) {
+	return createReactiveObject(raw, readonlyHanders);
+}
 
-      // 触发依赖
-      trigger(target, key);
-      return res;
-    }
-
-  })
+function createReactiveObject(raw, baseHandles) {
+	return new Proxy(raw, baseHandles);
 }
