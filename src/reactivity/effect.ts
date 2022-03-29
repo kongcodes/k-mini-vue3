@@ -1,5 +1,8 @@
 import { extend } from "../shared";
 
+let activeEffect;
+let shouldTrack;
+
 class reactiveEffect {
 	private _fn: any;
 	public scheduler: Function | undefined;
@@ -14,9 +17,19 @@ class reactiveEffect {
 	}
 
 	run() {
+		if (!this.active) {
+			// runner方法需要得到fn的返回值
+			return this._fn();
+		}
+
+		// 应该收集
+		shouldTrack = true;
 		activeEffect = this;
-		// runner方法需要得到fn的返回值
-		return this._fn();
+
+		const r = this._fn();
+		// reset
+		shouldTrack = false;
+		return r;
 	}
 
 	stop() {
@@ -35,6 +48,7 @@ function cleanupEffect(effect) {
 	effect.deps.forEach((dep: any) => {
 		dep.delete(effect);
 	});
+	effect.deps.length = 0;
 }
 
 const targetMap = new Map();
@@ -43,6 +57,8 @@ export function track(target, key) {
 	// targetMap -> { target: depsMap }
 	// depsMap -> {key: dep}
 	// dep -> activeEffect
+
+	if (!isTracking()) return; // 抽离-优化
 
 	let depsMap = targetMap.get(target);
 	if (!depsMap) {
@@ -55,11 +71,16 @@ export function track(target, key) {
 		dep = new Set();
 		depsMap.set(key, dep);
 	}
-
+	if (dep.has(activeEffect)) return; // 防止重复收集
 	dep.add(activeEffect);
 	// track的时候收集dep，stop会用到
-	if (!activeEffect) return; //解决只用reactive时，deps undefined的情况
 	activeEffect.deps.push(dep);
+}
+
+function isTracking() {
+	// if (!activeEffect) return; //解决只用reactive时，deps undefined的情况
+	// if (!shouldTrack) return; //解决stop后还会track的问题
+	return shouldTrack && activeEffect !== undefined;
 }
 
 export function trigger(target, key) {
@@ -74,7 +95,6 @@ export function trigger(target, key) {
 	}
 }
 
-let activeEffect;
 export function effect(fn, options: any = {}) {
 	const _effect = new reactiveEffect(fn, options.scheduler);
 

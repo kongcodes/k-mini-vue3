@@ -68,7 +68,8 @@ describe("effect", () => {
 		obj.num = 2;
 		expect(dummy).toBe(2);
 		stop(runner);
-		obj.num = 3;
+		// obj.num = 3;
+		obj.num++; // -> obj.num = obj.num + 1;
 		expect(dummy).toBe(2);
 
 		// stopped effect should still be manually called callable
