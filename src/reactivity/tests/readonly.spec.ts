@@ -11,6 +11,10 @@ describe("readonly", () => {
 		// isReadonly
 		expect(isReadonly(wrapped)).toBe(true);
 		expect(isReadonly(original)).toBe(false);
+
+		// 深层嵌套
+		expect(isReadonly(wrapped.bar)).toBe(true);
+		expect(isReadonly(original.bar)).toBe(false);
 	});
 
 	it("warn when call set", () => {
