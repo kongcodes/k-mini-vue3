@@ -16,11 +16,25 @@
 
 :white_check_mark: reactive 的实现
 
+:white_check_mark: readonly 的实现
+
 :white_check_mark: effect 的实现
 
 :white_check_mark: track 依赖收集
 
 :white_check_mark: trigger 触发依赖
+
+:white_check_mark: 支持 isReactive
+
+:white_check_mark: 支持 isReadonly
+
+:white_check_mark: 支持 isProxy
+
+:white_check_mark: 支持 effect.scheduler
+
+:white_check_mark: 支持 effect.stop
+
+:white_check_mark: 支持嵌套 reactive
 
 :white_large_square: ref 的实现
 
