@@ -7,6 +7,7 @@ class RefImpl {
 	private _value: any;
 	public dep: any;
 	private _rawValue: any; // 备份原始值
+	public __v_isRef = true;
 	constructor(value) {
 		this._rawValue = value;
 		this._value = convert(value);
@@ -44,4 +45,13 @@ function convert(value) {
 
 export function ref(value) {
 	return new RefImpl(value);
+}
+
+export function isRef(ref) {
+	// 如果传入数值 1 这种参数，ref.__v_isRef会是undefined，所以用!!转换成Boolean
+	return !!ref.__v_isRef;
+}
+
+export function unRef(ref) {
+	return isRef(ref) ? ref.value : ref;
 }
