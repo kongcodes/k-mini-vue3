@@ -3,7 +3,7 @@ import { extend } from "../shared";
 let activeEffect;
 let shouldTrack;
 
-class reactiveEffect {
+export class reactiveEffect {
 	private _fn: any;
 	public scheduler: Function | undefined;
 	// stop

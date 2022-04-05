@@ -46,7 +46,7 @@
 
 :white_check_mark: 支持 proxyRefs
 
-:white_large_square: computed 的实现
+:white_check_mark: computed 的实现
 
 ### runtime-core 初始化
 
