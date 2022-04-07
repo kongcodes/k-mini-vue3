@@ -6,10 +6,15 @@ export function render(vnode, container) {
 }
 
 function patch(vnode, container) {
+	/**
+	 * TODO
+	 * 区分是 element 还是 component
+	 * 判断两种类型
+	 */
+
+	// TODO processElement()
+
 	// 去处理组件
-
-	// 判断是不是 element 类型
-
 	processComponent(vnode, container);
 }
 
