@@ -10,9 +10,9 @@ export function createApp(rootComponent) {
 			 * 后面的所有逻辑都会基于 vnode 进行操作
 			 */
 
-			// if rootContainer is String
+			// rootContainer -> dom
 			if (typeof rootContainer === "string") {
-				rootComponent = document.querySelector(rootContainer);
+				rootContainer = document.querySelector(rootContainer);
 			}
 
 			const vnode = createVNode(rootComponent);
