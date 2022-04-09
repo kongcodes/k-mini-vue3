@@ -8,16 +8,17 @@ export const App = {
 				id: "root",
 				class: ["blue", "font-30"],
 			},
-			// "hello, k-mini-vue3"  // children is string
-			[
-				h("p", { class: "red" }, "是一个p标签"),
-				h("span", { class: "blue" }, "是一个span标签"),
-			] // children is array
+			"hello, " + this.msg + this.msg2 // children is string
+			// [
+			// 	h("p", { class: "red" }, "是一个p标签"),
+			// 	h("span", { class: "blue" }, "是一个span标签"),
+			// ] // children is array
 		);
 	},
 	setup() {
 		return {
 			msg: "kongcodes",
+			msg2: "/k-mini-vue3",
 		};
 	},
 };

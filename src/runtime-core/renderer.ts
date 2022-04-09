@@ -9,7 +9,6 @@ export function render(vnode, container) {
 
 function patch(vnode, container) {
 	/**
-	 * TODO
 	 * 区分是 element 还是 component
 	 * 判断两种类型
 	 */
@@ -40,7 +39,7 @@ function mountElement(vnode, container) {
 		el.textContent = children;
 	} else if (Array.isArray(children)) {
 		// children is array
-		mountChildren(vnode.children, el);
+		mountChildren(vnode.children, el); // 抽离-优化
 	}
 
 	// props
@@ -73,7 +72,8 @@ function mountComponent(vnode: any, container) {
 }
 
 function setupRenderEffect(instance: any, container) {
-	const subTree = instance.render();
+	const { proxy } = instance;
+	const subTree = instance.render.call(proxy);
 
 	// vnode -> patch
 	// vnode -> element -> mountElement
