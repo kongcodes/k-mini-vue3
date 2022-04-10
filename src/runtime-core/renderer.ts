@@ -32,6 +32,9 @@ function mountElement(vnode, container) {
 	const { type, children, props } = vnode;
 
 	const el = document.createElement(type);
+	// $el
+	// vnode -> element -> div
+	vnode.el = el;
 
 	// children -> string or array
 	if (typeof children === "string") {
@@ -78,4 +81,8 @@ function setupRenderEffect(instance: any, container) {
 	// vnode -> patch
 	// vnode -> element -> mountElement
 	patch(subTree, container);
+
+	// all element -> mount
+	// $el根节点赋值到当前组件vnode的el上面
+	instance.vnode.el = subTree.el;
 }

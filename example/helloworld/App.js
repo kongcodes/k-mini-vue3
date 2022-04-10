@@ -1,13 +1,21 @@
 import { h } from "../../lib/k-mini-vue3.esm.js";
 
+// debug 控制台调试输出 self
+window.self = null;
 export const App = {
 	render() {
+		// debug 控制台调试输出 self
+		window.self = this;
 		return h(
 			"div",
 			{
 				id: "root",
 				class: ["blue", "font-30"],
 			},
+			/**
+			 * 1. setupState
+			 * 2. this.$el -> get root element
+			 */
 			"hello, " + this.msg + this.msg2 // children is string
 			// [
 			// 	h("p", { class: "red" }, "是一个p标签"),
