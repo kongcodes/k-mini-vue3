@@ -10,7 +10,13 @@ export const App = {
 			"div",
 			{
 				id: "root",
-				class: ["blue", "font-30"],
+				class: ["font-30"],
+				onClick() {
+					console.log("click事件");
+				},
+				onMouseenter: () => {
+					console.log("鼠标进入事件");
+				},
 			},
 			/**
 			 * 1. setupState

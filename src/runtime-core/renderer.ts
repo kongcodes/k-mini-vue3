@@ -1,4 +1,4 @@
-import { isObject } from "../shared";
+import { isObject, isOn } from "../shared";
 import { createComponentInstance, setupComponent } from "./component";
 
 export function render(vnode, container) {
@@ -48,7 +48,13 @@ function mountElement(vnode, container) {
 	// props
 	for (const key in props) {
 		const val = props[key];
-		el.setAttribute(key, val);
+		console.log(key);
+		if (isOn(key)) {
+			const eventName = key.slice(2).toLowerCase(); //onClick等，删除 on 变成小写
+			el.addEventListener(eventName, val);
+		} else {
+			el.setAttribute(key, val);
+		}
 	}
 
 	container.append(el);
