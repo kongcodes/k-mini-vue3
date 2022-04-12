@@ -1,4 +1,5 @@
 import { h } from "../../lib/k-mini-vue3.esm.js";
+import { Foo } from "./Foo.js";
 
 // debug 控制台调试输出 self
 window.self = null;
@@ -22,11 +23,18 @@ export const App = {
 			 * 1. setupState
 			 * 2. this.$el -> get root element
 			 */
-			"hello, " + this.msg + this.msg2 // children is string
+
+			// children is string
+			// "hello, " + this.msg + this.msg2
+
+			// children is array
 			// [
 			// 	h("p", { class: "red" }, "是一个p标签"),
 			// 	h("span", { class: "blue" }, "是一个span标签"),
-			// ] // children is array
+			// ]
+
+			// 子组件 props
+			[h(Foo, { count: 100 })]
 		);
 	},
 	setup() {

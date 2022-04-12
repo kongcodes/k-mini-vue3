@@ -1,16 +1,21 @@
+import { shallowReadonly } from "../reactivity/reactive";
+import { hasOwn } from "../shared";
+import { initProps } from "./componentProps";
+
 export function createComponentInstance(vnode) {
 	const component = {
 		vnode,
 		type: vnode.type,
 		setupState: {},
+		props: {},
 	};
 
 	return component;
 }
 
 export function setupComponent(instance) {
+	initProps(instance, instance.vnode.props);
 	// TODO
-	// initProps();
 	// initSlots();
 
 	setupStatefulComponent(instance);
@@ -24,11 +29,17 @@ function setupStatefulComponent(instance: any) {
 		{},
 		{
 			get(target, key) {
-				const { setupState } = instance;
-				if (key in setupState) {
-					return setupState[key];
-				}
+				const { setupState, props } = instance;
 
+				// if (key in setupState) {
+				// 	return setupState[key];
+				// }
+				if (hasOwn(setupState, key)) {
+					return setupState[key];
+				} else if (hasOwn(props, key)) {
+					// props
+					return props[key];
+				}
 				// key -> $el
 				if (key === "$el") {
 					return instance.vnode.el;
@@ -45,7 +56,7 @@ function setupStatefulComponent(instance: any) {
 		// setup() 可能返回 function 或者 object
 		// 如果是function 就认为组件返回了render函数
 		// 如果是object 会把object注入到组件上下文中
-		const setupResult = setup();
+		const setupResult = setup(shallowReadonly(instance.props));
 		handleSetupResult(instance, setupResult);
 	}
 }

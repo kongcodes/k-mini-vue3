@@ -3,7 +3,7 @@ import { createComponentInstance, setupComponent } from "./component";
 
 export function render(vnode, container) {
 	// patch
-	console.log("vnode-----", vnode);
+	// console.log("vnode-----", vnode);
 	patch(vnode, container);
 }
 
@@ -13,7 +13,7 @@ function patch(vnode, container) {
 	 * 判断两种类型
 	 */
 	// debugger;
-	console.log("patch-------", vnode);
+	// console.log("patch-------", vnode);
 
 	if (isObject(vnode.type)) {
 		// 去处理组件
@@ -48,7 +48,7 @@ function mountElement(vnode, container) {
 	// props
 	for (const key in props) {
 		const val = props[key];
-		console.log(key);
+		// console.log(key);
 		if (isOn(key)) {
 			const eventName = key.slice(2).toLowerCase(); //onClick等，删除 on 变成小写
 			el.addEventListener(eventName, val);

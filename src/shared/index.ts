@@ -10,3 +10,7 @@ export const hasChanged = (value, newValue) => {
 
 // 事件注册
 export const isOn = (key) => /^on[A-Z]/.test(key);
+
+// props
+export const hasOwn = (val, key) =>
+	Object.prototype.hasOwnProperty.call(val, key);
