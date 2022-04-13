@@ -1,5 +1,6 @@
 import { shallowReadonly } from "../reactivity/reactive";
 import { hasOwn } from "../shared";
+import { emit } from "./componentEmit";
 import { initProps } from "./componentProps";
 
 export function createComponentInstance(vnode) {
@@ -8,7 +9,13 @@ export function createComponentInstance(vnode) {
 		type: vnode.type,
 		setupState: {},
 		props: {},
+		emit: () => {},
 	};
+
+	// 处理emit方法，需要event和instance两个参数，但用户只传一个 add
+	// 如：emit('add')
+	// 所以在这里使用bind处理这个问题
+	component.emit = emit.bind(null, component) as any;
 
 	return component;
 }
@@ -56,7 +63,9 @@ function setupStatefulComponent(instance: any) {
 		// setup() 可能返回 function 或者 object
 		// 如果是function 就认为组件返回了render函数
 		// 如果是object 会把object注入到组件上下文中
-		const setupResult = setup(shallowReadonly(instance.props));
+		const setupResult = setup(shallowReadonly(instance.props), {
+			emit: instance.emit,
+		});
 		handleSetupResult(instance, setupResult);
 	}
 }
