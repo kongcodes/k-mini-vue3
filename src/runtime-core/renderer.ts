@@ -82,7 +82,9 @@ function mountComponent(vnode: any, container) {
 
 function setupRenderEffect(instance: any, container) {
 	const { proxy } = instance;
-	const subTree = instance.render.call(proxy);
+	const subTree = instance.render.call(proxy); // 第一次执行App.js根组件中的render函数，这个函数返回由h创建的vnode
+
+	console.log("--subTree", subTree);
 
 	// vnode -> patch
 	// vnode -> element -> mountElement
