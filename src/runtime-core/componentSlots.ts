@@ -1,8 +1,12 @@
+import { ShapeFlags } from "../shared/ShapeFlags";
+
 export function initSlots(instance, children) {
-	// 组件 && children 是 object 才是 slots
+	// 判断是slot的时候才执行函数,组件 && children 是 object 才是 slots
+	const { shapeFlag } = instance.vnode;
 	// if (typeof instance.type === "object" && typeof children === "object") {
-	normalizeObjectSlots(instance, children);
-	// }
+	if (shapeFlag & ShapeFlags.SLOT_CHILDREN) {
+		normalizeObjectSlots(instance, children);
+	}
 }
 
 function normalizeObjectSlots(instance, children) {
