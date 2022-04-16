@@ -1,4 +1,4 @@
-import { h } from "../../lib/k-mini-vue3.esm.js";
+import { h, createTextVnode } from "../../lib/k-mini-vue3.esm.js";
 import { Foo } from "./Foo.js";
 
 export const App = {
@@ -25,7 +25,11 @@ export const App = {
 		// 4. 作用域插槽 num
 		const testSlot = {
 			head: ({ num }) => h("p", { class: "slot" }, "head-slot" + num),
-			foot: () => h("p", { class: "slot" }, "foot-slot"),
+			// foot: () => h("p", { class: "slot" }, "foot-slot"),
+			foot: () => [
+				h("p", { class: "slot" }, "foot-slot"),
+				createTextVnode("哈哈哈"),
+			],
 		};
 
 		const foo = h(Foo, {}, testSlot);

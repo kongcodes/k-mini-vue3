@@ -1,4 +1,4 @@
-import { createVNode } from "../vnode";
+import { createVNode, Fragment } from "../vnode";
 
 export function renderSlots(slots, name, props) {
 	// 非具名 不传name
@@ -12,7 +12,7 @@ export function renderSlots(slots, name, props) {
 	if (slot) {
 		if (typeof slot === "function") {
 			// 处理作用域插槽
-			return createVNode("div", {}, slot(props));
+			return createVNode(Fragment, {}, slot(props));
 		}
 		// return createVNode("div", {}, slot);
 	}

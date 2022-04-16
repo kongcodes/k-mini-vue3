@@ -1,6 +1,7 @@
 import { isObject, isOn } from "../shared";
 import { ShapeFlags } from "../shared/ShapeFlags";
 import { createComponentInstance, setupComponent } from "./component";
+import { Fragment, Text } from "./vnode";
 
 export function render(vnode, container) {
 	// patch
@@ -17,13 +18,27 @@ function patch(vnode, container) {
 	// console.log("patch-------", vnode);
 
 	// 使用 shapeFlag 判断类型
-	const { shapeFlag } = vnode;
-	// shapeFlag & ShapeFlags.STATEFUL_COMPONENT 等同于 typeof vnode.type === "object"
-	if (shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
-		// 去处理组件
-		processComponent(vnode, container);
-	} else if (shapeFlag & ShapeFlags.ELEMENT) {
-		processElement(vnode, container);
+	const { type, shapeFlag } = vnode;
+
+	switch (type) {
+		case Fragment:
+			processFragment(vnode, container);
+			break;
+
+		case Text:
+			processText(vnode, container);
+			break;
+
+		default:
+			// shapeFlag & ShapeFlags.STATEFUL_COMPONENT 等同于 typeof vnode.type === "object"
+			if (shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
+				// 处理component
+				processComponent(vnode, container);
+			} else if (shapeFlag & ShapeFlags.ELEMENT) {
+				// 处理 element
+				processElement(vnode, container);
+			}
+			break;
 	}
 }
 
@@ -99,4 +114,14 @@ function setupRenderEffect(instance: any, container) {
 	// all element -> mount
 	// $el根节点赋值到当前组件vnode的el上面
 	instance.vnode.el = subTree.el;
+}
+
+// slot 的 Fragment 和 Text
+function processFragment(vnode: any, container: any) {
+	mountChildren(vnode.children, container);
+}
+function processText(vnode: any, container: any) {
+	const { children } = vnode;
+	const textNode = (vnode.el = document.createTextNode(children)); // 需要赋值给vnode的el
+	container.append(textNode);
 }
