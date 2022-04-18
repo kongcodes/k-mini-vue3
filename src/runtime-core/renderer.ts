@@ -6,10 +6,10 @@ import { Fragment, Text } from "./vnode";
 export function render(vnode, container) {
 	// patch
 	// console.log("vnode-----", vnode);
-	patch(vnode, container);
+	patch(vnode, container, null); // 处理根组件不传 parentComponent 参数
 }
 
-function patch(vnode, container) {
+function patch(vnode, container, parentComponent) {
 	/**
 	 * 区分是 element 还是 component
 	 * 判断两种类型
@@ -22,7 +22,7 @@ function patch(vnode, container) {
 
 	switch (type) {
 		case Fragment:
-			processFragment(vnode, container);
+			processFragment(vnode, container, parentComponent);
 			break;
 
 		case Text:
@@ -33,21 +33,21 @@ function patch(vnode, container) {
 			// shapeFlag & ShapeFlags.STATEFUL_COMPONENT 等同于 typeof vnode.type === "object"
 			if (shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
 				// 处理component
-				processComponent(vnode, container);
+				processComponent(vnode, container, parentComponent);
 			} else if (shapeFlag & ShapeFlags.ELEMENT) {
 				// 处理 element
-				processElement(vnode, container);
+				processElement(vnode, container, parentComponent);
 			}
 			break;
 	}
 }
 
 // element 类型
-function processElement(vnode: any, container: any) {
-	mountElement(vnode, container);
+function processElement(vnode: any, container: any, parentComponent) {
+	mountElement(vnode, container, parentComponent);
 }
 
-function mountElement(vnode, container) {
+function mountElement(vnode, container, parentComponent) {
 	const { type, children, props } = vnode;
 
 	const el = document.createElement(type);
@@ -63,7 +63,7 @@ function mountElement(vnode, container) {
 		el.textContent = children;
 	} else if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
 		// children is array
-		mountChildren(vnode.children, el); // 抽离-优化
+		mountChildren(vnode.children, el, parentComponent); // 抽离-优化
 	}
 
 	// props
@@ -81,20 +81,20 @@ function mountElement(vnode, container) {
 	container.append(el);
 }
 
-function mountChildren(children: any, el: any) {
+function mountChildren(children: any, el: any, parentComponent) {
 	children.forEach((v) => {
-		patch(v, el);
+		patch(v, el, parentComponent);
 	});
 }
 
 // component 类型
-function processComponent(vnode: any, container: any) {
-	mountComponent(vnode, container);
+function processComponent(vnode: any, container: any, parentComponent) {
+	mountComponent(vnode, container, parentComponent);
 }
 
-function mountComponent(vnode: any, container) {
+function mountComponent(vnode: any, container, parentComponent) {
 	// 创建组件实例
-	const instance = createComponentInstance(vnode);
+	const instance = createComponentInstance(vnode, parentComponent);
 
 	setupComponent(instance);
 
@@ -105,11 +105,11 @@ function setupRenderEffect(instance: any, container) {
 	const { proxy } = instance;
 	const subTree = instance.render.call(proxy); // 第一次执行App.js根组件中的render函数，这个函数返回由h创建的vnode
 
-	console.log("--subTree", subTree);
+	// console.log("--subTree", subTree);
 
 	// vnode -> patch
 	// vnode -> element -> mountElement
-	patch(subTree, container);
+	patch(subTree, container, instance); // parentComponent -> instance
 
 	// all element -> mount
 	// $el根节点赋值到当前组件vnode的el上面
@@ -117,8 +117,8 @@ function setupRenderEffect(instance: any, container) {
 }
 
 // slot 的 Fragment 和 Text
-function processFragment(vnode: any, container: any) {
-	mountChildren(vnode.children, container);
+function processFragment(vnode: any, container: any, parentComponent) {
+	mountChildren(vnode.children, container, parentComponent);
 }
 function processText(vnode: any, container: any) {
 	const { children } = vnode;

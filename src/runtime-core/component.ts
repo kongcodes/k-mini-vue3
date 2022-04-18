@@ -4,13 +4,16 @@ import { emit } from "./componentEmit";
 import { initProps } from "./componentProps";
 import { initSlots } from "./componentSlots";
 
-export function createComponentInstance(vnode) {
+export function createComponentInstance(vnode, parent) {
+	// console.log("parent", parent);
 	const component = {
 		vnode,
 		type: vnode.type,
 		setupState: {},
 		props: {},
 		slots: {}, // 就是vnode的children
+		provides: parent ? parent.provides : {}, // 获取父级。ProviderTwo中再设置一个foo，会导致父级的foo发生变化，用原型链解决
+		parent,
 		emit: () => {},
 	};
 

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+		<style>
+			.app-border {
+				border: 5px solid forestgreen;
+				min-width: 200px;
+				min-height: 200px;
+				padding: 15px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="app"></div>
+		<script type="module">
+			import { createApp } from "../../lib/k-mini-vue3.esm.js";
+			import { App } from "./App.js";
+
+			createApp(App).mount("#app");
+		</script>
+	</body>
+</html>
