@@ -1,3 +1,4 @@
+import { proxyRefs } from "../reactivity";
 import { shallowReadonly } from "../reactivity/reactive";
 import { hasOwn } from "../shared";
 import { emit } from "./componentEmit";
@@ -14,6 +15,8 @@ export function createComponentInstance(vnode, parent) {
 		slots: {}, // 就是vnode的children
 		provides: parent ? parent.provides : {}, // 获取父级。ProviderTwo中再设置一个foo，会导致父级的foo发生变化，用原型链解决
 		parent,
+		isMounted: false,
+		subTree: {},
 		emit: () => {},
 	};
 
@@ -91,7 +94,7 @@ function handleSetupResult(instance, setupResult: any) {
 	// TODO function
 
 	if (typeof setupResult === "object") {
-		instance.setupState = setupResult;
+		instance.setupState = proxyRefs(setupResult);
 	}
 
 	finishComponentSetup(instance);
