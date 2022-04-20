@@ -56,6 +56,10 @@
 
 :white_large_square: 初始化 props
 
+### runtime-dom
+
+:white_check_mark: 支持 custom renderer
+
 ### compiler-core
 
 :white_large_square: 解析插值
