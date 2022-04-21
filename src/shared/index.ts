@@ -1,3 +1,5 @@
+export const EMPTY_OBJ = {};
+
 export const extend = Object.assign;
 
 export function isObject(val) {
