@@ -10,6 +10,8 @@ export function createRenderer(options) {
 		createElement: hostCreateElement,
 		patchProp: hostPatchProp,
 		insert: hostInsert,
+		remove: hostRemove,
+		setElementText: hostSetElementText,
 	} = options;
 
 	function render(vnode, container) {
@@ -60,11 +62,11 @@ export function createRenderer(options) {
 		if (!n1) {
 			mountElement(n2, container, parentComponent);
 		} else {
-			patchElement(n1, n2, container);
+			patchElement(n1, n2, container, parentComponent);
 		}
 	}
 
-	function patchElement(n1, n2, container) {
+	function patchElement(n1, n2, container, parentComponent) {
 		console.log("n1", n1);
 		console.log("n2", n2);
 		console.log("container", container);
@@ -74,9 +76,47 @@ export function createRenderer(options) {
 		const newProps = n2.props || EMPTY_OBJ;
 		const el = n1.el;
 		n2.el = el; // 本轮n2就是下一轮的n1，不赋值的话 下轮n1中就没有el
-		patchProps(el, oldProps, newProps);
 
-		// TODO update children
+		patchChildren(n1, n2, el, parentComponent);
+		patchProps(el, oldProps, newProps);
+	}
+
+	function patchChildren(n1, n2, container, parentComponent) {
+		const prevShapeFlag = n1.shapeFlag;
+		const nextShapeFlag = n2.shapeFlag;
+		const c1 = n1.children;
+		const c2 = n2.children;
+
+		if (nextShapeFlag & ShapeFlags.TEXT_CHILDREN) {
+			// TODO 优化
+			if (prevShapeFlag & ShapeFlags.ARRAY_CHILDREN) {
+				// array -> text
+				// 1. 把老的清空
+				unmountChildren(n1.children);
+				// 2. 设置text
+				hostSetElementText(container, c2);
+			} else {
+				// text -> text
+				// 前后节点不一样才需要改变
+				if (c1 !== c2) {
+					hostSetElementText(container, c2);
+				}
+			}
+		} else {
+			// text -> children
+			if (prevShapeFlag & ShapeFlags.TEXT_CHILDREN) {
+				hostSetElementText(container, "");
+				mountChildren(c2, container, parentComponent);
+			}
+		}
+	}
+
+	function unmountChildren(children) {
+		for (let i = 0; i < children.length; i++) {
+			const el = children[i].el;
+			// remove
+			hostRemove(el);
+		}
 	}
 
 	function patchProps(el, oldProps, newProps) {

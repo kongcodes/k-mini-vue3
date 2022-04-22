@@ -48,7 +48,7 @@
 
 :white_check_mark: computed 的实现
 
-### runtime-core 初始化
+### runtime-core
 
 :white_large_square: 支持组件类型
 
@@ -67,3 +67,11 @@
 :white_large_square: 解析 element
 
 :white_large_square: 解析 text
+
+### TODO
+
+:white_large_square: 组件代理对象/$el 抽离优化
+
+:white_large_square: custom renderer 示例：canvas 平台
+
+:white_large_square: patchChildren() 转换成 text 的优化
