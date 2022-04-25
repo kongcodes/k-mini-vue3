@@ -13,7 +13,7 @@ function createElement(type) {
  * @param val -> nextVal 当前的值
  */
 function patchProp(el, key, prevVal, val) {
-	console.log("patchProp------------");
+	// console.log("patchProp------------");
 	if (isOn(key)) {
 		const eventName = key.slice(2).toLowerCase(); //onClick等，删除 on 变成小写
 		el.addEventListener(eventName, val);
@@ -26,9 +26,10 @@ function patchProp(el, key, prevVal, val) {
 	}
 }
 
-function insert(el, parent) {
-	console.log("insert------------");
-	parent.append(el);
+function insert(el, parent, anchor) {
+	// console.log("insert------------");
+	// parent.append(el);
+	parent.insertBefore(el, anchor || null);
 }
 
 function remove(child) {
