@@ -186,12 +186,27 @@ export function createRenderer(options) {
 			const toBePatched = e2 - s2 + 1; // 新的中需要对比的全部数量
 			let patched = 0; // 已经对比完成的
 
+			/**
+			 * 最长递增子序列
+			 * 移动
+			 * 建立映射表 定长数组
+			 */
+			const newIndexToOldIndexMap = new Array(toBePatched);
+			for (let i = 0; i < toBePatched; i++) newIndexToOldIndexMap[i] = 0;
+
+			/**
+			 * 移动 优化
+			 * 什么时候需要移动
+			 */
+			let moved = false;
+			let maxNewIndexSoFar = 0;
+
+
 			// 基于新的 里面的 key 建立 映射表
 			const keyToNewIndexMap = new Map()
 			for (let i = s2; i <= e2; i++) {
 				const nextChild = c2[i];
 				keyToNewIndexMap.set(nextChild.key, i);
-
 			}
 
 			// 遍历老的
@@ -205,7 +220,7 @@ export function createRenderer(options) {
 				}
 
 				let newIndex;
-				// 判断 null 和 undefined
+				// 根据 null 和 undefined 判断用户写没写key
 				if (prevChild.key !== null) {
 					newIndex = keyToNewIndexMap.get(prevChild.key);
 				} else {
@@ -223,17 +238,53 @@ export function createRenderer(options) {
 				if (newIndex === undefined) {
 					hostRemove(prevChild.el);
 				} else {
+					if (newIndex >= maxNewIndexSoFar) {
+						maxNewIndexSoFar = newIndex;
+					} else {
+						moved = true;
+					}
+					/**
+					 * 为什么是i+1,而不是i?
+					 * 因为i 可能是0，而0在这里有特殊含义，因为初始化赋的值就是0，需要用0判断是否需要创建元素
+					 * 所以就赋值为i+1 避免这个问题
+					 */
+					newIndexToOldIndexMap[newIndex - s2] = i + 1;
 					patch(prevChild, c2[newIndex], container, parentComponent, null);
 					patched++;
 				}
 			}
 
+			// 生成最长递增子序列
+			const increasingNewIndexSequence = moved ? getSequence(newIndexToOldIndexMap) : [];
+			let j = increasingNewIndexSequence.length - 1; // 生成的子序列的下标
 
+			// 从后往前遍历,因为 insertBefore插入元素需要在一个稳定元素的前面插入
+			for (let i = toBePatched - 1; i >= 0; i--) {
+				const nextIndex = i + s2;
+				const nextChild = c2[nextIndex];
+				const anchor = nextIndex + 1 < c2.length ? c2[nextIndex + 1].el : null;
 
+				/**
+				 * 创建
+				 */
+				if (newIndexToOldIndexMap[i] === 0) {
+					// 在老的里面没有需要创建
+					patch(null, nextChild, container, parentComponent, anchor);
+				}
+				/**
+				 * 移动
+				 */
+				else if (moved) {
+					if (j < 0 || i !== increasingNewIndexSequence[j]) {
+						// 移动位置
+						hostInsert(nextChild.el, container, anchor);
+					} else {
+						j--;
+					}
+				}
+			}
 		}
 	}
-
-
 
 	function unmountChildren(children) {
 		for (let i = 0; i < children.length; i++) {
@@ -381,4 +432,46 @@ export function createRenderer(options) {
 	return {
 		createApp: createAppAPI(render),
 	};
+}
+
+// 最长递增子序列算法
+function getSequence(arr) {
+	const p = arr.slice();
+	const result = [0];
+	let i, j, u, v, c;
+	const len = arr.length;
+	for (i = 0; i < len; i++) {
+		const arrI = arr[i];
+		if (arrI !== 0) {
+			j = result[result.length - 1];
+			if (arr[j] < arrI) {
+				p[i] = j;
+				result.push(i);
+				continue;
+			}
+			u = 0;
+			v = result.length - 1;
+			while (u < v) {
+				c = (u + v) >> 1;
+				if (arr[result[c]] < arrI) {
+					u = c + 1;
+				} else {
+					v = c;
+				}
+			}
+			if (arrI < arr[result[u]]) {
+				if (u > 0) {
+					p[i] = result[u - 1];
+				}
+				result[u] = i;
+			}
+		}
+	}
+	u = result.length;
+	v = result[u - 1];
+	while (u-- > 0) {
+		result[u] = v;
+		v = p[v];
+	}
+	return result;
 }
