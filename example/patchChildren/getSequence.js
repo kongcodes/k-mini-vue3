@@ -41,4 +41,4 @@ function getSequence(arr) {
 }
 
 const r = getSequence([4, 2, 3, 1, 5]);
-console.log(r); // 输出 [1, 2, 4] 是 数组中最长递增子序列 2,3,5 的下标。
+console.log(r); // 输出 [1, 2, 4] 是 数组中 2,3,5 的下标。

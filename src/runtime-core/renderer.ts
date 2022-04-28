@@ -221,7 +221,7 @@ export function createRenderer(options) {
 
 				let newIndex;
 				// 根据 null 和 undefined 判断用户写没写key
-				if (prevChild.key !== null) {
+				if (prevChild.key != null) {
 					newIndex = keyToNewIndexMap.get(prevChild.key);
 				} else {
 					// 如果没有 key 就需要遍历判断 性能低
