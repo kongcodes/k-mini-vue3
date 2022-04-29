@@ -18,6 +18,8 @@ export function createComponentInstance(vnode, parent) {
 		isMounted: false,
 		subTree: {},
 		emit: () => {},
+		update: null,
+		next: null,
 	};
 
 	// 处理emit方法，需要event和instance两个参数，但用户只传一个 add
@@ -65,6 +67,11 @@ function setupStatefulComponent(instance: any) {
 				// key -> $slot
 				if (key === "$slot") {
 					return instance.slots;
+				}
+
+				// key -> $props
+				if (key === "$props") {
+					return instance.props;
 				}
 			},
 		}
