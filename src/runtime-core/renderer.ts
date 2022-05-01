@@ -4,6 +4,7 @@ import { ShapeFlags } from "../shared/ShapeFlags";
 import { createComponentInstance, setupComponent } from "./component";
 import { shouldUpdateComponent } from "./componentUpdateUtils";
 import { createAppAPI } from "./createApp";
+import { queueJobs } from "./scheduler";
 import { Fragment, Text } from "./vnode";
 
 export function createRenderer(options) {
@@ -68,9 +69,9 @@ export function createRenderer(options) {
 	}
 
 	function patchElement(n1, n2, container, parentComponent, anchor) {
-		console.log("n1", n1);
-		console.log("n2", n2);
-		console.log("container", container);
+		// console.log("n1", n1);
+		// console.log("n2", n2);
+		// console.log("container", container);
 
 		// update props
 		const oldProps = n1.props || EMPTY_OBJ;
@@ -404,6 +405,7 @@ export function createRenderer(options) {
 	function setupRenderEffect(instance: any, container, anchor) {
 		// 使用effect包裹原来的逻辑，收集依赖
 		instance.update = effect(() => {
+			console.log("setupRenderEffect");
 			if (!instance.isMounted) {
 				// 未挂载就是 init 初始化
 				const { proxy } = instance;
@@ -441,7 +443,14 @@ export function createRenderer(options) {
 
 				patch(prevSubTree, subTree, container, instance, anchor);
 			}
-		});
+		},
+			{
+				scheduler() {
+					console.log("update-scheduler");
+					queueJobs(instance.update);
+				}
+			}
+		);
 	}
 
 	// slot 的 Fragment 和 Text
