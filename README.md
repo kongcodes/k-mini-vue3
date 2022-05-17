@@ -50,11 +50,31 @@
 
 ### runtime-core
 
-:white_large_square: 支持组件类型
+:white_check_mark: 支持组件类型
 
-:white_large_square: 支持 element 类型
+:white_check_mark: 支持 element 类型
 
-:white_large_square: 初始化 props
+:white_check_mark: 初始化 props
+
+:white_check_mark: setup 可获取 props 和 context
+
+:white_check_mark: 支持 component emit
+
+:white_check_mark: 支持 proxy
+
+:white_check_mark: 可以在 render 函数中获取 setup 返回的对象
+
+:white_check_mark: nextTick 的实现
+
+:white_check_mark: 支持 getCurrentInstance
+
+:white_check_mark: 支持 provide/inject
+
+:white_check_mark: 支持最基础的 slots
+
+:white_check_mark: 支持 Text 类型节点
+
+:white_check_mark: 支持 $el api
 
 ### runtime-dom
 
