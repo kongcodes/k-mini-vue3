@@ -1,4 +1,4 @@
-import { NodeTypes } from "./ast";
+import { NodeTypes, TagTypes } from "./ast";
 
 export function baseParse(content: string) {
 
@@ -9,11 +9,42 @@ export function baseParse(content: string) {
 function parseChildren(context) {
   const nodes: any = [];
   let node;
-  if (context.source.startsWith("{{")) {
+  const s = context.source;
+  if (s.startsWith("{{")) {
     node = parseInterpolation(context);
+  } else if (s[0] === "<") {
+    if (/[a-z]/i.test(s[1])) {
+      node = parseElement(context);
+    }
   }
   nodes.push(node);
   return nodes;
+}
+
+function parseElement(context: any) {
+  const element = parseTag(context, TagTypes.START);
+  parseTag(context, TagTypes.END);
+  // console.log("-------", context.source);
+  return element;
+}
+
+function parseTag(context: any, type: TagTypes) {
+  // 1.解析 tag
+  const match: any = /^<\/?([a-z]*)/i.exec(context.source); //<d 或者 </d 开头，因为要两次处理，第一次是开始标签第二次是结束标签
+  const tag = match[1]; // -> div
+
+  // 2.删除处理过的内容
+  advanceBy(context, match[0].length);
+  // console.log(context.source); // "></div>"
+  advanceBy(context, 1); // "</div>"
+
+  // 处理结束标签时不需要返回值
+  if (type === TagTypes.END) return;
+
+  return {
+    type: NodeTypes.ELEMENT,
+    tag,
+  };
 }
 
 function parseInterpolation(context) {
