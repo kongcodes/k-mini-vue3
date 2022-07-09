@@ -17,8 +17,23 @@ function parseChildren(context) {
       node = parseElement(context);
     }
   }
+
+  // 解析 Text
+  if(!node){
+    node = parseText(context);
+  }
+
   nodes.push(node);
   return nodes;
+}
+
+function parseText(context: any){
+  const content = parseTextData(context, context.source.length);
+
+  return {
+    type: NodeTypes.TEXT,
+    content
+  }
 }
 
 function parseElement(context: any) {
@@ -55,12 +70,12 @@ function parseInterpolation(context) {
   const closeIndex = context.source.indexOf(closeDelimiter, openDelimiter.length);
   advanceBy(context, openDelimiter.length); // -> message}}
   const rawContentLength = closeIndex - openDelimiter.length;
-  const rawContent = context.source.slice(0, rawContentLength);
+  const rawContent = parseTextData(context, rawContentLength);
   const content = rawContent.trim();
   // console.log(context.source);
   // console.log(content);
 
-  advanceBy(context, rawContentLength + closeDelimiter.length); // -> message
+  advanceBy(context, closeDelimiter.length); // -> message
 
   return {
     type: NodeTypes.INTERPOLATION,
@@ -84,6 +99,14 @@ function createRoot(children) {
 }
 
 // util
+function parseTextData(context: any, length) {
+  // 1. 获取content
+  const content = context.source.slice(0, length);
+  // 2. 推进
+  advanceBy(context, length);
+  // console.log(context.source); // 空
+  return content;
+}
 function advanceBy(context: any, length: number) {
   context.source = context.source.slice(length);
 }
