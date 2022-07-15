@@ -35,13 +35,16 @@ function parseChildren(context, parentTag) {
 function parseText(context: any){
 
   let endIndex = context.source.length;
-  let endToken = "{{";
-
-  const index = context.source.indexOf(endToken);
-  if (index !== -1) {
-    endIndex = index;
+  // let endToken = "{{";
+  // 处理 edge case 1
+  let endTokens = ["{{", "<"];
+  for (let i = 0; i < endTokens.length; i++) {
+    const index = context.source.indexOf(endTokens[i]);
+    // 让 index 尽可能的小，靠左
+    if (index !== -1 && endIndex > index) {
+      endIndex = index;
+    }
   }
-
   // 获取 content
   const content = parseTextData(context, endIndex);
   console.log("content -----------", content);
@@ -130,6 +133,7 @@ function parseTextData(context: any, length) {
 function advanceBy(context: any, length: number) {
   context.source = context.source.slice(length);
 }
+// 判断结束
 function isEnd(context, parentTag) {
   // 2. 遇到结束标签的时候
   const s = context.source;
