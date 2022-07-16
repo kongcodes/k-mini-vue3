@@ -94,5 +94,12 @@ describe("Parse", () => {
     })
   });
 
+  // edge case 2 处理没有结束标签的情况
+  test('should throw error when lack end tag', () => {
+    // baseParse("<div><span></div>");
+    expect(() => {
+      baseParse("<div><span></div>");
+    }).toThrow(`缺少结束标签：span`);
+  });
 
 });

@@ -3,21 +3,21 @@ import { NodeTypes, TagTypes } from "./ast";
 export function baseParse(content: string) {
 
   const context = createParserContext(content);
-  return createRoot(parseChildren(context, "")); // 初始 parentTag 为空
+  return createRoot(parseChildren(context, [])); // 初始时 ancestors 栈为空
 }
 
-function parseChildren(context, parentTag) {
+function parseChildren(context, ancestors) {
   const nodes: any = [];
 
   // 重复执行，没有结束的时候就一直重复执行
-  while(!isEnd(context, parentTag)){
+  while(!isEnd(context, ancestors)){
     let node;
     const s = context.source;
     if (s.startsWith("{{")) {
       node = parseInterpolation(context);
     } else if (s[0] === "<") {
       if (/[a-z]/i.test(s[1])) {
-        node = parseElement(context);
+        node = parseElement(context, ancestors);
       }
     }
   
@@ -55,13 +55,24 @@ function parseText(context: any){
   }
 }
 
-function parseElement(context: any) {
+function parseElement(context: any, ancestors) {
   // 1. 解析两个 tag
   const element: any = parseTag(context, TagTypes.START);
+  // 此处把 tag 存入栈中，下面的 parseChildren 会递归执行 parseElement，遇到 tag 再次存进来
+  ancestors.push(element);
   // 2. 解析 tag 之间的 children
-  element.children = parseChildren(context, element.tag);
-  parseTag(context, TagTypes.END);
-  // console.log("-------", context.source);
+  element.children = parseChildren(context, ancestors);
+  ancestors.pop(); // children 执行完成之后
+
+  console.log(context.source); // </div>
+  console.log(element.tag); // span
+  // 相等的时候 才能处理
+  if (startsWithEndTagOpen(context.source, element.tag)) {
+    parseTag(context, TagTypes.END);
+  } else {
+    throw new Error(`缺少结束标签：${element.tag}`);
+  }
+
   return element;
 }
 
@@ -134,13 +145,27 @@ function advanceBy(context: any, length: number) {
   context.source = context.source.slice(length);
 }
 // 判断结束
-function isEnd(context, parentTag) {
+function isEnd(context, ancestors) {
   // 2. 遇到结束标签的时候
   const s = context.source;
-  // if (s.startsWith("</div>")){
-  if (parentTag && s.startsWith(`</${parentTag}>`)){ // 初始化时 parentTag 为空,不需要走此流程
-    return true;
+  // if (parentTag && s.startsWith(`</${parentTag}>`)){ // 初始化时 parentTag 为空,不需要走此流程
+  //   return true;
+  // }
+  // </div>
+  if(s.startsWith("</")){
+    // for(let i = 0; i < ancestors.length; i++) {
+    //从栈顶开始查，从后往前循环遍历，对于此逻辑来说 性能更好，因为正常情况下我们要找到的tag 是在后面的，这样可以减少查找的次数
+    for(let i = ancestors.length - 1; i >= 0; i--){
+      const tag = ancestors[i].tag;
+      if(startsWithEndTagOpen(s, tag)){
+        return true;
+      }
+    }
   }
   // 1. source 有值的时候,返回 false 不结束
   return !s;
+}
+function startsWithEndTagOpen(source, tag) {
+  // return source.slice(2, 2 + tag.length) === tag;
+  return source.startsWith("</") && source.slice(2, 2 + tag.length).toLowerCase() === tag.toLowerCase();
 }
